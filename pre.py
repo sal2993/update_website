@@ -10,10 +10,15 @@ input_info = '''# setlocal spell spelllang=en_us
 title:
 post:'''
 
-def update(all_posts):
+def update(all_posts, date):
+  
   for i in all_posts:
     subprocess.call(['vim', i])
-  subprocess.call(['mv * post/'], shell=True)
+    subprocess.call(['mv ' + i + ' post/'], shell=True)
+
+  subprocess.call(['mkdir ' + 'pic/' + date], shell=True)
+  return
+
 
 def findmonday():
   # Get todays date
@@ -46,7 +51,14 @@ def create_posts(date_post):
     f = open(x, 'w')
     f.write(input_info)
     f.close()
-  update(posts_all)
+
+  posts_all.append(date_post + '_title.txt')
+  f = open(posts_all[-1], 'w')
+  f.write('Title for the whole blog post:')
+  f.close()
+
+  update(posts_all, date_post)
+  return
 
 def main():
   print 'hello user. Which week are you going to add posts too?'
