@@ -10,16 +10,9 @@ input_info = '''# setlocal spell spelllang=en_us
 title:
 post:'''
 
-def update(all_posts, date):
-  
-  for i in all_posts:
-    subprocess.call(['vim', i])
-    subprocess.call(['mv ' + i + ' post/'], shell=True)
-
-  subprocess.call(['mkdir ' + 'pic/' + date], shell=True)
-  return
-
-
+# ******************************************************************************
+# This functions simply finds the next 3 upcomming monday dates
+# returns the dates in ordinal date format in an array
 def findmonday():
   # Get todays date
   today = datetime.date.today()
@@ -43,6 +36,9 @@ def findmonday():
 
   return next_mondays
   
+# ******************************************************************************
+# Crates the blog post names which will be .txt files to hold the post data
+# Passes the array of post file names to update() to be created to files.
 def create_posts(date_post):
   posts_all = []
   for i in range(5):
@@ -60,25 +56,44 @@ def create_posts(date_post):
   update(posts_all, date_post)
   return
 
+# ******************************************************************************
+# Makes directory to store the files. Lets user update files. Makes a folder 
+# for respective pictures. 
+def update(all_posts, date):
+  
+  subprocess.call(['mkdir ' + 'post/' + date], shell=True)
+  for i in all_posts:
+    subprocess.call(['vim', i])
+    subprocess.call(['mv ' + i + ' post/' + date], shell=True)
+
+  subprocess.call(['mkdir ' + 'pic/' + date], shell=True)
+  return
+
+# *****************************************************************************
 def main():
+  # Greey user
   print 'hello user. Which week are you going to add posts too?'
+
+  # Gets next Mondays
   mondays = findmonday()
   
-  for i in range(len(mondays)):
-    print 'date ' + str(i+1) + ': ' + str(datetime.date.fromordinal(mondays[i]))
-
   usr_inp = -100
+
+  # Have user pick out date to update
   while (usr_inp != '1' and usr_inp != '2' and usr_inp != '3'):
-  
+
+    for i in range(len(mondays)):
+      print 'date ' + str(i+1) + ': ' + str(datetime.date.fromordinal(mondays[i]))
+
     usr_inp = raw_input('Date you would like to update: ')
     print usr_inp
-    #if (usr_inp != 1 or usr_inp != 2 or usr_inp != 3):
-      #print 'sorry, your input was invalid.'
+    if (usr_inp != 1 or usr_inp != 2 or usr_inp != 3):
+      print 'sorry, your input was invalid.'
     
   usr_inp = int(usr_inp)
   post_date = str(datetime.date.fromordinal(mondays[usr_inp-1]))
 
-  print 'you win: ' + post_date
+  print 'Date chose: ' + post_date
   create_posts(post_date)
 
 

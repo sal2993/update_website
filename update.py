@@ -2,6 +2,7 @@
 import sys
 import re
 import time
+import subprocess
 
 fram = '''<!DOCTYPE html>
 <html class="no-js" lang="en">
@@ -71,26 +72,55 @@ bpost = '''  <div class="row">
 
 '''
 
-new_info_f = 'updateweek.xml'
 update_page_f = 'test.html'
 
-#*******************************************************************************
+# ******************************************************************************
+# Which week will you be updating?
+def which():
+  # get the posts ready to be updated and put in list
+  ls = subprocess.check_output(['ls', 'post'])
+  ls = ls.split('\n')
+  del(ls[-1])  # deletes unnecesary blank line 
+
+  # removes the options that have already been updated.
+  # the options that have already been updated, the directorys end with a 'u'
+  for i in range(len(ls)):
+    if ls[i][-1] == 'u':
+      del(ls[i])
+
+  inp = 100
+  # Ask the user which post will he want updated
+  while inp > len(ls) or inp <= 0:
+    try:
+      for i in range(len(ls)):
+        print str(i +1) + ': ' + ls[i]
+      inp = int(raw_input("Post you like to be updated: "))
+    except ValueError:
+      print 'you put in a letter you mega fool'
+      inp = 100
+
+  # has to have to -1 otherwise it would be out of range
+  return ls[inp -1]
+
+# ******************************************************************************
 # This function will run only every monday to change the title of the 
 # week.html. 
-def change_title():
+def change_title(update_post):
+  new_info_f = './post/' + update_post + '/' + update_post + '_title.txt'
 
   # Write the basic <head> html
   f = open(update_page_f, 'w')
   f.write(fram)
   f.close()
 
-  # Find title message in updateweek.xml with Regex
+  # Find title message in post/date_title.txt with Regex
   f = open(new_info_f, 'r')
-  match = re.search(r'<message>\n(.+)</message>', f.read(), re.DOTALL)
+  match = re.search(r'Title for the whole blog post:(.+)', f.read(), re.DOTALL)
+  print match.group()
 
   # Replace theme_titme frame with the new data
   new_theme = theme_title.replace("#TITLE", match.group(1))
-  new_theme = new_theme.replace("#DATEOFMONDAY", '1-1-3001')
+  new_theme = new_theme.replace("#DATEOFMONDAY", update_post)
   f.close()
 
   # Write new data to the new week.html file
@@ -136,7 +166,11 @@ def change_post():
 
 
 def main():
-  change_title()
+  # which will return the post to be updated to the website
+  post_update = which()
+  print post_update
+
+  change_title( post_update )
 
   sys.exit(0)
   
