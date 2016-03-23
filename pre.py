@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 # Currenty, this program askes for user to fill in title and body for each
-# post for the week.
+# post for the selected week (next 3 upcoming mondays).
 
 import subprocess
 import datetime
@@ -61,10 +61,10 @@ def create_posts(date_post):
 # for respective pictures. 
 def update(all_posts, date):
   
-  subprocess.call(['mkdir ' + 'post/' + date], shell=True)
+  subprocess.call(['mkdir ' + 'post/' + date + 'u'], shell=True)
   for i in all_posts:
     subprocess.call(['vim', i])
-    subprocess.call(['mv ' + i + ' post/' + date], shell=True)
+    subprocess.call(['mv ' + i + ' post/' + date + 'u'], shell=True)
 
   subprocess.call(['mkdir ' + 'pic/' + date], shell=True)
   return
@@ -86,8 +86,7 @@ def main():
       print 'date ' + str(i+1) + ': ' + str(datetime.date.fromordinal(mondays[i]))
 
     usr_inp = raw_input('Date you would like to update: ')
-    print usr_inp
-    if (usr_inp != 1 or usr_inp != 2 or usr_inp != 3):
+    if (usr_inp != '1' and usr_inp != '2' and usr_inp != '3'):
       print 'sorry, your input was invalid.'
     
   usr_inp = int(usr_inp)

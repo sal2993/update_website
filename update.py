@@ -75,52 +75,58 @@ bpost = '''  <div class="row">
 update_page_f = 'test.html'
 
 # ******************************************************************************
-# Which week will you be updating?
-def which():
-  # get the posts ready to be updated and put in list
-  ls = subprocess.check_output(['ls', 'post'])
-  ls = ls.split('\n')
-  del(ls[-1])  # deletes unnecesary blank line 
+# Beautiful code that is now deprecated :( To be deleted..
 
-  # removes the options that have already been updated.
-  # the options that have already been updated, the directorys end with a 'u'
-  for i in range(len(ls)):
-    if ls[i][-1] == 'u':
-      del(ls[i])
+### Which week will you be updating?
+##def which():
+##  # get the posts ready to be updated and put in list
+##  ls = subprocess.check_output(['ls', 'post'])
+##  ls = ls.split('\n')
+##  del(ls[-1])  # deletes unnecesary blank line 
 
-  inp = 100
-  # Ask the user which post will he want updated
-  while inp > len(ls) or inp <= 0:
-    try:
-      for i in range(len(ls)):
-        print str(i +1) + ': ' + ls[i]
-      inp = int(raw_input("Post you like to be updated: "))
-    except ValueError:
-      print 'you put in a letter you mega fool'
-      inp = 100
+##  # removes the options that have already been updated.
+##  # the options that have already been updated, the directorys end with a 'u'
+##  for i in range(len(ls)):
+##    if ls[i][-1] == 'u':
+##      del(ls[i])
 
-  # has to have to -1 otherwise it would be out of range
-  return ls[inp -1]
+##  inp = 100
+##  # Ask the user which post will he want updated
+##  while inp > len(ls) or inp <= 0:
+##    try:
+##      for i in range(len(ls)):
+##        print str(i +1) + ': ' + ls[i]
+##      inp = int(raw_input("Post you like to be updated: "))
+##    except ValueError:
+##      print 'you put in a letter you mega fool'
+##      inp = 100
+
+##  # has to have to -1 otherwise it would be out of range
+##  return ls[inp -1]
+
 
 # ******************************************************************************
 # This function will run only every monday to change the title of the 
 # week.html. 
+
+## -- Currently this just changes the title of the test.html
 def change_title(update_post):
-  new_info_f = './post/' + update_post + '/' + update_post + '_title.txt'
+  new_info_f = './post/' + update_post + '/' + update_post[0:-1] + '_title.txt'
+  print new_info_f
 
   # Write the basic <head> html
   f = open(update_page_f, 'w')
   f.write(fram)
   f.close()
 
-  # Find title message in post/date_title.txt with Regex
+  # Find title message ONLY in post/date_title.txt with Regex
   f = open(new_info_f, 'r')
   match = re.search(r'Title for the whole blog post:(.+)', f.read(), re.DOTALL)
   print match.group()
 
   # Replace theme_titme frame with the new data
   new_theme = theme_title.replace("#TITLE", match.group(1))
-  new_theme = new_theme.replace("#DATEOFMONDAY", update_post)
+  new_theme = new_theme.replace("#DATEOFMONDAY", update_post[0:-1])
   f.close()
 
   # Write new data to the new week.html file
@@ -128,16 +134,21 @@ def change_title(update_post):
   f.write(new_theme)
 
   f.close()
+
+  # Now cp test.html to the test.html in /data/www/test.html
+  subprocess.call('sudo cp test.html /data/www/test.html', shell=True)
+  return
   
 # ******************************************************************************
-def change_post():
+def change_post( update_post):
   # Find what dat you need to post by searching the week.html for <!-- Day # -->
 
 # CAN BE ERRORS, FIX THAT
   for i in range(5):
 
     # open the files with the post data
-    post = 'post' + str(i) + '.txt'
+    post = '~/capthat/post/' + update_post + '/' + update_post[:-1] + str(i) + \
+           '.txt'
     f = open(post, 'r')
     post_data = f.read()
     f.close()
@@ -166,11 +177,20 @@ def change_post():
 
 
 def main():
-  # which will return the post to be updated to the website
-  post_update = which()
-  print post_update
+  try:
+    file_update = sys.argv[1]
+  except:
+    print 'something went wrong with reading the file to be uploaded'
 
-  change_title( post_update )
+  
+  
+  # which will return the post to be updated to the website
+  # post_update = which()
+  # print post_update
+
+  change_title( file_update )
+  change_post( file_update )
+  
 
   sys.exit(0)
   

@@ -55,7 +55,8 @@ def parse_updates(updates):
       post_to_site(ordin)
       break
 
-  transfer_job = './tes.py ' + str(updates[0]) + ' &'
+  print './update.py ' + str(updates[0]) + ' &'
+  transfer_job = './update.py ' + str(updates[0]) + ' &'
   subprocess.call( transfer_job , shell=True)
   return
 
